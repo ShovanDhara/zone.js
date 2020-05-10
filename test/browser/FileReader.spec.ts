@@ -1,95 +1,106 @@
-import {ifEnvSupports} from '../util';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 
-describe('FileReader', ifEnvSupports('FileReader', function () {
-  var fileReader;
-  var blob;
-  var data = 'Hello, World!';
-  var testZone = Zone.current.fork({ name: 'TestZone' });
+import {ifEnvSupports} from '../test-util';
+declare const global: any;
 
-  // Android 4.3's native browser doesn't implement add/RemoveEventListener for FileReader 
-  function supportsEventTargetFns () {
-    return FileReader.prototype.addEventListener && FileReader.prototype.removeEventListener;
-  }
-  (<any>supportsEventTargetFns).message = 'FileReader#addEventListener and FileReader#removeEventListener';
+describe('FileReader', ifEnvSupports('FileReader', function() {
+           let fileReader: FileReader;
+           let blob: Blob;
+           const data = 'Hello, World!';
+           const testZone = Zone.current.fork({name: 'TestZone'});
 
-  beforeEach(function () {
-    fileReader = new FileReader();
+           // Android 4.3's native browser doesn't implement add/RemoveEventListener for FileReader
+           function supportsEventTargetFns() {
+             return FileReader.prototype.addEventListener &&
+                 FileReader.prototype.removeEventListener;
+           }
+           (<any>supportsEventTargetFns).message =
+               'FileReader#addEventListener and FileReader#removeEventListener';
 
-    try {
-      blob = new Blob([data]);
-    } catch (e) {
-      // For hosts that don't support the Blob ctor (e.g. Android 4.3's native browser)
-      var blobBuilder = new global['WebKitBlobBuilder']();
-      blobBuilder.append(data);
+           beforeEach(function() {
+             fileReader = new FileReader();
 
-      blob = blobBuilder.getBlob();
-    }
-  });
+             try {
+               blob = new Blob([data]);
+             } catch (e) {
+               // For hosts that don't support the Blob ctor (e.g. Android 4.3's native browser)
+               const blobBuilder = new global['WebKitBlobBuilder']();
+               blobBuilder.append(data);
 
-  describe('EventTarget methods', ifEnvSupports(supportsEventTargetFns, function () {
-    it('should bind addEventListener listeners', function (done) {
-      testZone.run(function () {
-        fileReader.addEventListener('load', function () {
-          expect(Zone.current).toBe(testZone);
-          expect(fileReader.result).toEqual(data);
-          done();
-        });
-      });
+               blob = blobBuilder.getBlob();
+             }
+           });
 
-      fileReader.readAsText(blob);
-    });
+           describe('EventTarget methods', ifEnvSupports(supportsEventTargetFns, function() {
+                      it('should bind addEventListener listeners', function(done) {
+                        testZone.run(function() {
+                          fileReader.addEventListener('load', function() {
+                            expect(Zone.current).toBe(testZone);
+                            expect(fileReader.result).toEqual(data);
+                            done();
+                          });
+                        });
 
-    it('should remove listeners via removeEventListener', function (done) {
-      var listenerSpy = jasmine.createSpy('listener');
+                        fileReader.readAsText(blob);
+                      });
 
-      testZone.run(function () {
-        fileReader.addEventListener('loadstart', listenerSpy);
-        fileReader.addEventListener('loadend', function () {
-          expect(listenerSpy).not.toHaveBeenCalled();
-          done();
-        });
-      });
+                      it('should remove listeners via removeEventListener', function(done) {
+                        const listenerSpy = jasmine.createSpy('listener');
 
-      fileReader.removeEventListener('loadstart', listenerSpy);
-      fileReader.readAsText(blob);
-    });
-  }));
+                        testZone.run(function() {
+                          fileReader.addEventListener('loadstart', listenerSpy);
+                          fileReader.addEventListener('loadend', function() {
+                            expect(listenerSpy).not.toHaveBeenCalled();
+                            done();
+                          });
+                        });
 
-  it('should bind onEventType listeners', function (done) {
-    var listenersCalled = 0;
+                        fileReader.removeEventListener('loadstart', listenerSpy);
+                        fileReader.readAsText(blob);
+                      });
+                    }));
 
-    testZone.run(function () {
-      fileReader.onloadstart = function () {
-        listenersCalled++;
-        expect(Zone.current).toBe(testZone);
-      };
+           it('should bind onEventType listeners', function(done) {
+             let listenersCalled = 0;
 
-      fileReader.onload = function () {
-        listenersCalled++;
-        expect(Zone.current).toBe(testZone);
-      };
+             testZone.run(function() {
+               fileReader.onloadstart = function() {
+                 listenersCalled++;
+                 expect(Zone.current).toBe(testZone);
+               };
 
-      fileReader.onloadend = function () {
-        listenersCalled++;
+               fileReader.onload = function() {
+                 listenersCalled++;
+                 expect(Zone.current).toBe(testZone);
+               };
 
-        expect(Zone.current).toBe(testZone);
-        expect(fileReader.result).toEqual(data);
-        expect(listenersCalled).toBe(3);
-        done();
-      };
-    });
+               fileReader.onloadend = function() {
+                 listenersCalled++;
 
-    fileReader.readAsText(blob);
-  });
+                 expect(Zone.current).toBe(testZone);
+                 expect(fileReader.result).toEqual(data);
+                 expect(listenersCalled).toBe(3);
+                 done();
+               };
+             });
 
-  it('should have correct readyState', function (done) {
-    fileReader.onloadend = function () {
-      expect(fileReader.readyState).toBe((<any>FileReader).DONE);
-      done();
-    };
+             fileReader.readAsText(blob);
+           });
 
-    expect(fileReader.readyState).toBe((<any>FileReader).EMPTY);
+           it('should have correct readyState', function(done) {
+             fileReader.onloadend = function() {
+               expect(fileReader.readyState).toBe((<any>FileReader).DONE);
+               done();
+             };
 
-    fileReader.readAsText(blob);
-  });
-}));
+             expect(fileReader.readyState).toBe((<any>FileReader).EMPTY);
+
+             fileReader.readAsText(blob);
+           });
+         }));

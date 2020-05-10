@@ -1,31 +1,29 @@
-// Must be loaded before zone loads, so that zone can detect WTF.
-import './wtf_mock';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 
-// Setup tests for Zone without microtask support
-import '../lib/zone';
-import '../lib/browser/browser.ts';
-import '../lib/zone-spec/long-stack-trace';
-import '../lib/zone-spec/wtf';
-
-// Setup test environment
-import './test-env-setup';
-
+import 'core-js/features/set';
+import 'core-js/features/map';
 // List all tests here:
-import './long-stack-trace-zone.spec';
-import './async-test.spec';
-import './sync-test.spec';
-import './microtasks.spec';
-import './zone.spec';
-import './integration/brick.spec';
-import './browser/util.spec';
+import './common_tests';
+import './browser/browser.spec';
+import './browser/define-property.spec';
 import './browser/element.spec';
 import './browser/FileReader.spec';
+// import './browser/geolocation.spec.manual';
 import './browser/HTMLImports.spec';
-import './browser/Promise.spec';
+import './browser/MutationObserver.spec';
 import './browser/registerElement.spec';
 import './browser/requestAnimationFrame.spec';
-import './browser/setInterval.spec';
-import './browser/setTimeout.spec';
 import './browser/WebSocket.spec';
 import './browser/XMLHttpRequest.spec';
-//import './browser/geolocation.spec.manual';
+import './browser/MediaQuery.spec';
+import './browser/Notification.spec';
+import './browser/Worker.spec';
+import './mocha-patch.spec';
+import './jasmine-patch.spec';
+import './extra/cordova.spec';

@@ -1,7 +1,9 @@
+bazel-out
 build/
+build-esm/
+build-esm-2015/
 blink-core/
 blink-idl/
-typings/
 parsed-idl/
 /node_modules
 .idea
